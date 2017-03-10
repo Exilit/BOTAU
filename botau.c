@@ -3,6 +3,7 @@
 #include <avr/interrupt.h>
 #include <avr/boot.h>
 #include <util/delay.h>
+#include <stdlib.h>
 #include "uart.h"
 
 #define BOOT_UART_BAUD_RATE     9600     /* Baudrate */
@@ -122,12 +123,21 @@ int main(void)
     temp = MCUCR;
     MCUCR = temp | (1<<IVCE);
     MCUCR = temp | (1<<IVSEL);
+    
+    DDRB = 0xFF;
+    PORTB = 0xFF;
  
     /* Einstellen der Baudrate und aktivieren der Interrupts */
     uart_init( UART_BAUD_SELECT(BOOT_UART_BAUD_RATE,F_CPU) ); 
     sei();
  
     uart_puts("Hallo hier ist der echte Bootloader\n\r");
+    uart_puts("Ich befinde mich an Adresse ");
+    char str[16];
+    itoa(&main, str, 16);
+    uart_puts(str);
+    uart_puts("\n\r");
+    
     _delay_ms(2000);
  
     do
